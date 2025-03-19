@@ -1,13 +1,32 @@
+#include <Meshtastic.h>
+#include <Wire.h>
+
+// to exclude memory profiling set debug to false
+// consumes 26 bytes of SRAM
 #define DEBUG_MODE true
+
 #if DEBUG_MODE
   #include "MemoryStats.h"
 #endif
 
+// todo
+// usage disclaimer
+// node description/menu handler?
+
 void setup() {
+
   Serial.begin(9600);
   while (!Serial) {
-    ; // wait for serial port to connect. Native USB port only
+    ; // wait for serial port to connect. USB port only
   }
+  // log if unable to connect after certain duration?
+  // need toolset to set limit for elasped time mills and datetime? can I get epoch time?
+  // interface must implement? object that gets passed? or lib knows how to count elapsed times?
+  Wire.begin();  // start i2c
+
+  // todo set time if power loss, prompt for epoch
+  //time_t currentTime = 1742279720;
+  //rtc.setEpoch(currentTime);
 }
 
 void loop() {
@@ -17,7 +36,7 @@ void loop() {
       printMemoryStats();
       void* testBuffer = malloc(1024);
       if (testBuffer == nullptr) {
-        Serial.println("Could not allocate memory for  testBuffer");
+        Serial.println(F("Could Not Allocate Memory for testBuffer"));
         return;
       }
       printMemoryStats();

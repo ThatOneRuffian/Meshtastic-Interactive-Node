@@ -1,4 +1,7 @@
 #include <Arduino.h>
+#include "PrintDivider.h"
+#include "Timestamp.h"
+
 extern int __heap_start, *__brkval;
 
 void printDataMetric(const __FlashStringHelper* metricTag, const unsigned int dataUsed, const unsigned int *volumeAvailable, const unsigned int *percentUsed){
@@ -9,13 +12,6 @@ void printDataMetric(const __FlashStringHelper* metricTag, const unsigned int da
   Serial.print(F(" bytes used ("));
   Serial.print(*percentUsed);
   Serial.println(F("%)"));
-}
-
-void printDivider(const __FlashStringHelper* glyph, const int padCount){
-  for (unsigned int i = 0; i <= padCount; i++){
-    Serial.print(glyph);
-  }
-  Serial.println();
 }
 
 void printMemoryStats() {
@@ -48,26 +44,18 @@ void printMemoryStats() {
   // Print Metrics
   const __FlashStringHelper* largeDiv = F("=");
   const __FlashStringHelper* smallDiv = F("-");
-  const unsigned int paddingWidth = 54;
-  //todo research real buffer size of millis()
-  const unsigned int timestampBufferSize = 50;
-  char timestampBuffer[timestampBufferSize];
-  
-  printDivider(largeDiv, paddingWidth);
-  
-  if(snprintf(timestampBuffer, timestampBufferSize, "Timestamp: %lu", millis()) > 0){
-    // If successful, then print system timestamp
-    Serial.println(timestampBuffer);
-    printDivider(smallDiv, paddingWidth);
-  }
-  
+
+  printDivider(largeDiv);
+  printTimestamp();
+  printDivider(smallDiv);
+
   // Print total RAM usage
   printDataMetric(F("Total RAM Used: "), staticData + heapStackUsed, &TOTAL_RAM, &totalUsedPercent);
-  printDivider(smallDiv, paddingWidth);
+  printDivider(smallDiv);
 
   // Print RAM Static / Heap / Stack composition
   printDataMetric(F("Static Data Usage: "), staticData, &TOTAL_RAM, &staticDataPercent);
   printDataMetric(F("Heap/Stack Usage: "), heapStackUsed, &ramAvailable, &heapStackPercent);
-  printDivider(largeDiv, paddingWidth);
+  printDivider(largeDiv);
   Serial.println();
 }
