@@ -1,7 +1,8 @@
 #include <Meshtastic.h>
 #include <Wire.h>
+#include "SystemLog.h"
 
-// to exclude memory profiling set debug to false
+// to exclude SRAM memory profiling set debug to false
 // consumes 26 bytes of SRAM
 #define DEBUG_MODE true
 
@@ -27,16 +28,30 @@ void setup() {
   // todo set time if power loss, prompt for epoch
   //time_t currentTime = 1742279720;
   //rtc.setEpoch(currentTime);
+
+  syslog bootLog = {"System Booted"};
+  writeInternalLogEntry(bootLog);
 }
 
 void loop() {
   if (Serial.available() > 0) {
-    
+
+    // print self-test
+
+    // todo this should only be ran if the last write is 0?
+    extern systemLogHeader _logHeaderData;
+    EEPROM.get(0, _logHeaderData);
+    if (_logHeaderData.nextWriteAddr == 0){
+      Serial.println(F("Initializing Internal Log"));
+      initInternalLog();
+    }
+
     #if DEBUG_MODE
       printMemoryStats();
       void* testBuffer = malloc(1024);
       if (testBuffer == nullptr) {
-        Serial.println(F("Could Not Allocate Memory for testBuffer"));
+        syslog buffErr = {"Failed Malloc"};
+        writeInternalLogEntry(buffErr);
         return;
       }
       printMemoryStats();

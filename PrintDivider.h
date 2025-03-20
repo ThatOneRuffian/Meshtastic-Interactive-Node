@@ -1,9 +1,9 @@
 #ifndef PRINT_DIVIDER_H
 #define PRINT_DIVIDER_H
 
-#include <Arduino.h>  // Required for __FlashStringHelper
+#include <Arduino.h>
+#define PADDING_WIDTH 54
 
-// Function prototype for printDivider
 void printDivider(const __FlashStringHelper* glyph);
 
-#endif // PRINT_DIVIDER_H
+#endif
